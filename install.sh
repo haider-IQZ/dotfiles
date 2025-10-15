@@ -107,12 +107,13 @@ fc-cache -fv
 
 # Copy all dotfiles
 echo "Copying dotfiles..."
-cp -r alacritty ~/.config/
-cp -r bspwm ~/.config/
-cp -r picom ~/.config/
-cp -r polybar ~/.config/
-cp -r rofi ~/.config/
-cp -r sxhkd ~/.config/
+mkdir -p ~/.config/alacritty ~/.config/bspwm ~/.config/picom ~/.config/polybar ~/.config/rofi ~/.config/sxhkd
+cp -r alacritty/* ~/.config/alacritty/
+cp -r bspwm/* ~/.config/bspwm/
+cp -r picom/* ~/.config/picom/
+cp -r polybar/* ~/.config/polybar/
+cp -r rofi/* ~/.config/rofi/
+cp -r sxhkd/* ~/.config/sxhkd/
 cp -r gtk-3.0 ~/.config/ 2>/dev/null || true
 cp -r fontconfig ~/.config/ 2>/dev/null || true
 cp .gtkrc-2.0 ~/ 2>/dev/null || true
