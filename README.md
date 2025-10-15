@@ -16,28 +16,30 @@ My BSPWM rice configuration for Arch Linux.
 
 ## Installation on Fresh Arch
 
-### 1. Install required packages
-sudo pacman -S bspwm sxhkd polybar picom rofi alacritty git base-devel thunar nitrogen
-
-### 2. Install AUR helper (if you don't have one)
-git clone https://aur.archlinux.org/paru.git
-cd paru
-makepkg -si
-cd ..
-
-then-install = = paru -S google-chrome windsurf 
-
-
-### 3. Clone this repository
+### 1. Clone this repository
+```bash
 git clone https://github.com/haider-IQZ/dotfiles.git
 cd dotfiles
+```
 
-### 4. Run the install script
+### 2. Run the install script
+```bash
 chmod +x install.sh
 ./install.sh
+```
 
-### 5. Restart bspwm
-Press Super+Shift+R or logout and login again.
+The script will automatically:
+- Install all required packages (pacman + AUR)
+- Install Oh My Zsh with Powerlevel10k theme
+- Install Zsh plugins (autosuggestions, syntax highlighting)
+- Copy all config files
+- Change your default shell to Zsh
+
+### 3. Logout and login
+After installation, logout and login again for Zsh to take effect.
+
+### 4. Done!
+Your BSPWM setup is ready! Press Super+Shift+R to reload if needed.
 
 ## Notes
 - Fonts are included in the fonts/ directory and will be installed automatically

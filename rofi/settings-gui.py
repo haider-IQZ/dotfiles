@@ -20,7 +20,12 @@ class SettingsMenu(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_decorated(False)  # Remove default titlebar
 
-        self.wallpaper_dir = os.path.expanduser("~/Pictures/Wallpapers")
+        # Preferences
+        self.prefs_path = os.path.expanduser("~/.config/rofi/settings-gui.json")
+        self.prefs = self.load_prefs()
+        
+        # Load wallpaper directory from prefs or use default
+        self.wallpaper_dir = self.prefs.get("wallpaper_dir", os.path.expanduser("~/Pictures/Wallpapers"))
 
         # External command availability
         self.has_feh = shutil.which("feh") is not None
@@ -32,12 +37,6 @@ class SettingsMenu(Gtk.Window):
         self.has_nmcli = shutil.which("nmcli") is not None
         self.has_resolvectl = shutil.which("resolvectl") is not None
         self.has_iperf3 = shutil.which("iperf3") is not None
-
-        # Preferences
-        self.prefs_path = os.path.expanduser("~/.config/rofi/settings-gui.json")
-        self.prefs = self.load_prefs()
-        self.has_nmcli = shutil.which("nmcli") is not None
-        self.has_resolvectl = shutil.which("resolvectl") is not None
 
         # Set dark theme
         settings = Gtk.Settings.get_default()
@@ -622,7 +621,7 @@ class SettingsMenu(Gtk.Window):
         self.back_button_box = Gtk.EventBox()
         back_label = Gtk.Label()
         back_label.set_markup(
-            '<span foreground="#b8bb26" size="16000" weight="bold">←</span>'
+            '<span foreground="#b8bb26" size="16000" weight="bold"></span>'
         )
         self.back_button_box.add(back_label)
         self.back_button_box.connect("button-press-event", lambda w, e: self.go_back())
@@ -647,7 +646,7 @@ class SettingsMenu(Gtk.Window):
         self.folder_button_box = Gtk.EventBox()
         folder_label = Gtk.Label()
         folder_label.set_markup(
-            '<span foreground="#fe8019" size="16000" weight="bold">📁</span>'
+            '<span foreground="#fe8019" size="16000" weight="bold"></span>'
         )
         self.folder_button_box.add(folder_label)
         self.folder_button_box.connect(
@@ -682,15 +681,6 @@ class SettingsMenu(Gtk.Window):
         # Create display settings page
         self.create_display_settings()
 
-        # Create bluetooth settings page
-        self.create_bluetooth_settings()
-
-        # Create network settings page
-        self.create_network_settings()
-
-        # Create shortcuts settings page
-        self.create_shortcuts_settings()
-
         # Show main menu by default
         self.stack.set_visible_child_name("main")
 
@@ -719,14 +709,10 @@ class SettingsMenu(Gtk.Window):
 
         # Settings buttons with icons and colors
         buttons = [
-            ("🖼", "Wallpaper", "#b8bb26", self.open_wallpaper),
-            ("🔊", "Audio", "#8ec07c", self.open_audio),
-            ("🖥", "Display", "#83a598", self.open_display),
-            ("📶", "Bluetooth", "#d3869b", self.open_bluetooth),
-            ("🌐", "Network", "#fabd2f", self.open_network),
-            ("⌨️", "Shortcuts", "#d79921", self.open_shortcuts),
-            ("📁", "Files", "#fe8019", self.open_files),
-            ("⚡", "Power", "#fb4934", self.open_power),
+            ("\uf03e", "Wallpaper", "#b8bb26", self.open_wallpaper),
+            ("\uf028", "Audio", "#8ec07c", self.open_audio),
+            ("\uf108", "Display", "#83a598", self.open_display),
+            ("\uf0e7", "Power", "#fb4934", self.open_power),
         ]
 
         row = 0
@@ -948,6 +934,10 @@ class SettingsMenu(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             new_dir = dialog.get_filename()
             self.wallpaper_dir = new_dir
+            
+            # Save to preferences
+            self.prefs["wallpaper_dir"] = new_dir
+            self.save_prefs()
 
             # Clear and reload wallpapers
             for child in self.wallpaper_flow.get_children():
@@ -957,13 +947,14 @@ class SettingsMenu(Gtk.Window):
             self.wallpaper_flow.show_all()
 
             # Show notification
-            subprocess.run(
-                [
-                    "notify-send",
-                    "Folder Changed",
-                    f"Now showing wallpapers from:\n{new_dir}",
-                ]
-            )
+            if self.has_notify:
+                subprocess.run(
+                    [
+                        "notify-send",
+                        "Folder Changed",
+                        f"Now showing wallpapers from:\n{new_dir}",
+                    ]
+                )
 
         dialog.destroy()
 
@@ -1024,7 +1015,7 @@ class SettingsMenu(Gtk.Window):
         icon_box.set_halign(Gtk.Align.CENTER)
 
         icon_label = Gtk.Label()
-        icon_label.set_markup(f'<span size="35000">{icon}</span>')
+        icon_label.set_markup(f'<span size="35000" foreground="#fe8019">{icon}</span>')
         icon_label.get_style_context().add_class("card-icon")
         icon_box.pack_start(icon_label, False, False, 0)
 
@@ -1071,7 +1062,7 @@ class SettingsMenu(Gtk.Window):
 
         # Title
         title = Gtk.Label()
-        title.set_markup('<span size="x-large" weight="600">🔊 Audio Settings</span>')
+        title.set_markup('<span size="x-large" weight="600" foreground="#fe8019"></span> <span size="x-large" weight="600">Audio Settings</span>')
         title.get_style_context().add_class("title-label")
         title.set_halign(Gtk.Align.START)
         audio_box.pack_start(title, False, False, 0)
@@ -1981,7 +1972,7 @@ class SettingsMenu(Gtk.Window):
 
         # Title
         title = Gtk.Label()
-        title.set_markup('<span size="x-large" weight="600">🌐 Network</span>')
+        title.set_markup('<span size="x-large" weight="600" foreground="#fe8019"></span> <span size="x-large" weight="600">Network</span>')
         title.get_style_context().add_class("title-label")
         title.set_halign(Gtk.Align.START)
         network_box.pack_start(title, False, False, 0)
@@ -1992,7 +1983,7 @@ class SettingsMenu(Gtk.Window):
 
         # Connection icon
         self.net_icon = Gtk.Label()
-        self.net_icon.set_markup('<span size="50000">🌐</span>')
+        self.net_icon.set_markup('<span size="50000" foreground="#fe8019"></span>')
         self.net_icon.set_halign(Gtk.Align.CENTER)
         status_hero.pack_start(self.net_icon, False, False, 10)
 
@@ -2050,186 +2041,10 @@ class SettingsMenu(Gtk.Window):
 
         network_box.pack_start(actions_box, False, False, 0)
 
-        # DNS presets card
-        dns_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        dns_card.get_style_context().add_class("control-card")
-
-        dns_header = Gtk.Label()
-        dns_header.set_markup(
-            '<span weight="600" size="large" foreground="#83a598">🌐 DNS Presets</span>'
-        )
-        dns_header.set_halign(Gtk.Align.START)
-        dns_card.pack_start(dns_header, False, False, 0)
-
-        dns_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        dns_row.set_halign(Gtk.Align.FILL)
-        dns_row.set_hexpand(True)
-
-        self.dns_combo = Gtk.ComboBoxText()
-        dns_options = [
-            "Cloudflare (1.1.1.1, 1.0.0.1)",
-            "Google (8.8.8.8, 8.8.4.4)",
-            "OpenDNS (208.67.222.222, 208.67.220.220)",
-            "Quad9 (9.9.9.9, 149.112.112.112)",
-            "AdGuard (94.140.14.14, 94.140.15.15)",
-        ]
-        for name in dns_options:
-            self.dns_combo.append_text(name)
-        saved_preset = self.prefs.get("dns_preset")
-        if saved_preset in dns_options:
-            self.dns_combo.set_active(dns_options.index(saved_preset))
-        else:
-            self.dns_combo.set_active(0)
-        dns_row.pack_start(self.dns_combo, True, True, 0)
-
-        apply_dns_btn = Gtk.Button(label="Apply DNS")
-        apply_dns_btn.get_style_context().add_class("apply-button")
-        apply_dns_btn.connect("clicked", self.apply_selected_dns)
-        dns_row.pack_end(apply_dns_btn, False, False, 0)
-
-        reset_dns_btn = Gtk.Button(label="Reset (Auto)")
-        reset_dns_btn.connect("clicked", self.reset_dns_to_auto)
-        reset_dns_btn.get_style_context().add_class("option-button")
-        dns_row.pack_end(reset_dns_btn, False, False, 10)
-
-        dns_card.pack_start(dns_row, False, False, 0)
-
-        # Custom DNS row
-        custom_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        custom_row.set_halign(Gtk.Align.FILL)
-        custom_row.set_hexpand(True)
-        self.custom_dns_entry = Gtk.Entry()
-        self.custom_dns_entry.set_placeholder_text(
-            "Custom DNS (comma-separated, e.g. 1.1.1.1,1.0.0.1)"
-        )
-        custom_row.pack_start(self.custom_dns_entry, True, True, 0)
-
-        apply_custom_btn = Gtk.Button(label="Apply Custom DNS")
-        apply_custom_btn.get_style_context().add_class("apply-button")
-        apply_custom_btn.connect("clicked", self.apply_custom_dns)
-        custom_row.pack_end(apply_custom_btn, False, False, 0)
-
-        dns_card.pack_start(custom_row, False, False, 0)
-        # Restore custom entry if any
-        if "dns_custom" in self.prefs:
-            self.custom_dns_entry.set_text(self.prefs.get("dns_custom") or "")
-        network_box.pack_start(dns_card, False, False, 0)
-
-        # Speed Test card (compact, modern)
-        self.speed_test_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.speed_test_card.get_style_context().add_class("control-card")
-        self.speed_test_card.set_margin_top(10)
-        self.speed_test_card.set_hexpand(True)
-        self.speed_test_card.set_vexpand(False)
-
-        # Header row: title + actions
-        st_header_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        st_header = Gtk.Label()
-        st_header.set_markup(
-            '<span weight="600" size="large" foreground="#b8bb26">⚡ Speed Test</span>'
-        )
-        st_header.set_halign(Gtk.Align.START)
-        st_header_row.pack_start(st_header, False, False, 0)
-
-        # Backend selector for speed test
-        self.speed_backend_combo = Gtk.ComboBoxText()
-        backends = ["Ookla", "iperf3"] if self.has_iperf3 else ["Ookla"]
-        for b in backends:
-            self.speed_backend_combo.append_text(b)
-        self.speed_backend_combo.set_active(0)
-        st_header_row.pack_end(self.speed_backend_combo, False, False, 0)
-
-        self.speed_test_start_btn = Gtk.Button(label="Start")
-        self.speed_test_start_btn.get_style_context().add_class(
-            "futuristic-apply-button"
-        )
-        self.speed_test_start_btn.connect("clicked", self.run_speed_test)
-        st_header_row.pack_end(self.speed_test_start_btn, False, False, 0)
-
-        self.speed_test_cancel_btn = Gtk.Button(label="Cancel")
-        self.speed_test_cancel_btn.get_style_context().add_class("option-button")
-        self.speed_test_cancel_btn.connect("clicked", self.cancel_speed_test)
-        self.speed_test_cancel_btn.set_sensitive(False)
-        st_header_row.pack_end(self.speed_test_cancel_btn, False, False, 0)
-
-        self.speed_test_card.pack_start(st_header_row, False, False, 0)
-
-        # Status line
-        self.speed_test_status = Gtk.Label()
-        self.speed_test_status.set_markup('<span size="small" alpha="70%">Ready</span>')
-        self.speed_test_status.set_halign(Gtk.Align.START)
-        self.speed_test_card.pack_start(self.speed_test_status, False, False, 0)
-
-        # Progress bars container
-        progress_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=40)
-        progress_container.set_halign(Gtk.Align.FILL)
-        progress_container.set_hexpand(True)
-        progress_container.set_vexpand(False)
-
-        # Download section
-        download_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        download_label = Gtk.Label()
-        download_label.set_markup(
-            '<span foreground="#b8bb26" weight="600">⬇️ Download</span>'
-        )
-        download_box.pack_start(download_label, False, False, 0)
-
-        self.download_progress = Gtk.ProgressBar()
-        self.download_progress.set_hexpand(True)
-        self.download_progress.set_size_request(-1, 16)
-        self.download_progress.set_show_text(False)
-        self.download_progress.get_style_context().add_class("speed-progress")
-        download_box.pack_start(self.download_progress, False, False, 0)
-
-        self.download_speed_label = Gtk.Label()
-        self.download_speed_label.set_markup(
-            '<span size="x-large" weight="700">0.0 Mbps</span>'
-        )
-        download_box.pack_start(self.download_speed_label, False, False, 0)
-
-        progress_container.pack_start(download_box, False, False, 0)
-
-        # Upload section
-        upload_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        upload_label = Gtk.Label()
-        upload_label.set_markup(
-            '<span foreground="#fe8019" weight="600">⬆️ Upload</span>'
-        )
-        upload_box.pack_start(upload_label, False, False, 0)
-
-        self.upload_progress = Gtk.ProgressBar()
-        self.upload_progress.set_hexpand(True)
-        self.upload_progress.set_size_request(-1, 16)
-        self.upload_progress.set_show_text(False)
-        self.upload_progress.get_style_context().add_class("speed-progress")
-        upload_box.pack_start(self.upload_progress, False, False, 0)
-
-        self.upload_speed_label = Gtk.Label()
-        self.upload_speed_label.set_markup(
-            '<span size="x-large" weight="700">0.0 Mbps</span>'
-        )
-        upload_box.pack_start(self.upload_speed_label, False, False, 0)
-
-        progress_container.pack_start(upload_box, False, False, 0)
-
-        self.speed_test_card.pack_start(progress_container, False, False, 0)
-
-        # Results row
-        results_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=30)
-        results_row.set_halign(Gtk.Align.CENTER)
-        self.ping_label = Gtk.Label()
-        self.ping_label.set_markup(
-            '<span size="large" foreground="#83a598">📡 Ping: -- ms</span>'
-        )
-        results_row.pack_start(self.ping_label, False, False, 0)
-        self.speed_test_card.pack_start(results_row, False, False, 0)
-
         # Bottom spacer to ensure last elements are reachable when scrolling
         spacer = Gtk.Box()
         spacer.set_size_request(-1, 60)
         network_box.pack_start(spacer, False, False, 0)
-
-        network_box.pack_start(self.speed_test_card, False, False, 0)
 
         # Add network_box to scrolled window (let GTK add a viewport automatically)
         scrolled_main.add(network_box)

@@ -10,9 +10,9 @@ super + q
 super + d
 	~/.config/rofi/launchers/type-3/launcher.sh
 
-# chrome browser
+# zen browser
 super + x
-	google-chrome-stable --password-store=basic --enable-features=VaapiVideoDecoder --enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist --disable-gpu-driver-bug-workarounds
+	zen-browser --enable-features=VaapiVideoDecoder --enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist
 
 # wallpaper selector
 super + k
@@ -23,24 +23,24 @@ super + e
 	GTK_THEME=Adwaita:dark thunar
 
 # volume control
-super + v
+super + shift + v
 	pavucontrol
 
-# screenshot - select area
+# virt-manager (dark theme)
+super + v
+	GTK_THEME=Adwaita:dark virt-manager
+
+# screenshot - flameshot GUI (select area, auto-clipboard)
 Print
-	maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+	flameshot gui
 
-# screenshot - full screen
+# screenshot - full screen and save
 shift + Print
-	maim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
-
-# screenshot - select area and copy to clipboard
-ctrl + Print
-	maim -s | xclip -selection clipboard -t image/png
+	flameshot full -p ~/Pictures
 
 # screenshot - full screen to clipboard
-ctrl + shift + Print
-	maim | xclip -selection clipboard -t image/png
+ctrl + Print
+	flameshot full -c
 
 # reload bspwm, sxhkd, and polybar
 super + shift + r

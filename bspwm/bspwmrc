@@ -1,5 +1,11 @@
 #! /bin/sh
 
+# Load Xresources (cursor theme, etc.)
+xrdb -merge ~/.Xresources &
+
+# Fix root window cursor (no more ugly X cursor on desktop)
+xsetroot -cursor_name left_ptr &
+
 pgrep -x sxhkd > /dev/null || sxhkd &
 nitrogen --restore &
 picom --config ~/.config/picom/picom.conf &
@@ -10,6 +16,9 @@ setxkbmap -layout us,ara -option grp:alt_shift_toggle &
 
 # Set XFCE/Thunar dark theme
 xfconf-query -c xsettings -p /Net/ThemeName -s "Adwaita-dark" --create -t string 2>/dev/null &
+
+# Force GTK apps (like virt-manager) to use dark theme
+export GTK_THEME=Adwaita:dark
 
 # Disable mouse acceleration for Glorious Model D
 xinput --set-prop "Glorious Model D- Wireless" 'libinput Accel Profile Enabled' 0, 1 2>/dev/null &
@@ -46,3 +55,6 @@ bspc rule -a Screenkey manage=off
 # Brave file picker dialogs
 bspc rule -a Brave-browser:*:Save\ File state=floating focus=on
 bspc rule -a Brave-browser:*:Open\ File state=floating focus=on
+
+# Virt-manager rule
+bspc rule -a Virt-manager desktop='^5' follow=on
