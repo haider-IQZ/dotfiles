@@ -1,0 +1,1 @@
+sudo rm /etc/machine-id /var/lib/dbus/machine-id && sudo dbus-uuidgen --ensure=/etc/machine-id && sudo dbus-uuidgen --ensure=/var/lib/dbus/machine-id && sudo systemctl restart dbus && sudo systemctl daemon-reexec
