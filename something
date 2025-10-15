@@ -12,3 +12,13 @@ sudo dbus-uuidgen --ensure=/var/lib/dbus/machine-id
 
 # Then REBOOT (don't restart services!)
 sudo reboot
+
+
+
+
+git clone https://github.com/FilippoDeSilva/cursor-ai-bypass.git
+cd cursor-ai-bypass
+
+pip install -r requirements.txt
+
+python main.py --all --config config.yaml
