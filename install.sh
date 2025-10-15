@@ -18,7 +18,7 @@ fi
 
 # Install required packages
 echo "📦 Installing required packages..."
-sudo pacman -S --needed bspwm sxhkd polybar picom rofi alacritty git base-devel thunar nitrogen flameshot ttf-dejavu zsh zsh-completions fastfetch pavucontrol || {
+sudo pacman -S --needed bspwm sxhkd polybar picom rofi alacritty git base-devel thunar nitrogen flameshot ttf-dejavu zsh zsh-completions fastfetch pavucontrol pipewire pipewire-pulse || {
     echo "❌ Failed to install packages!"
     exit 1
 }
