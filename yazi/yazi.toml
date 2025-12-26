@@ -1,0 +1,17 @@
+[opener]
+play = [
+	{ run = 'vlc "$@"', orphan = true, desc = "Play with VLC" },
+]
+extract = [
+	{ run = '7z x "$@"', desc = "Extract here" },
+]
+
+[open]
+rules = [
+	{ name = "*.mp4", use = "play" },
+	{ name = "*.mkv", use = "play" },
+	{ name = "*.avi", use = "play" },
+	{ name = "*.mov", use = "play" },
+	{ name = "*.webm", use = "play" },
+	{ name = "*.7z", use = "extract" },
+]
