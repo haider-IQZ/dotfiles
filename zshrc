@@ -33,3 +33,4 @@ nitch
 export QT_STYLE_OVERRIDE=kvantum
 export QT_QPA_PLATFORMTHEME=qt5ct
 alias dots="cd ~/dotfiles && git add -A && git commit -m \"sync\" && git push"
+alias dots="cd ~/dotfiles && git add -A && git commit -m \"sync\" && git push"
