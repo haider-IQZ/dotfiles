@@ -1,0 +1,143 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", "Font Awesome 6 Free", sans-serif;
+    font-size: 15px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: transparent;
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+}
+
+/* Common style for all modules */
+#workspaces,
+#clock,
+#memory,
+#pulseaudio.microphone,
+.modules-right > widget > box,
+#battery,
+#cpu,
+#temperature,
+#network,
+#tray,
+#idle_inhibitor {
+    background-color: rgba(30, 30, 30, 0.75);
+    border-radius: 12px;
+    padding: 4px 16px;
+    margin: 4px 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Specific module adjustments */
+#workspaces {
+    padding: 2px 4px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #888888;
+    background-color: transparent;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button:hover {
+    background-color: rgba(245, 194, 231, 0.2);
+    color: #f5c2e7;
+}
+
+#workspaces button.active {
+    color: #f5c2e7;
+    background-color: rgba(245, 194, 231, 0.15);
+}
+
+#workspaces button.urgent {
+    background-color: #f38ba8;
+    color: #11111b;
+}
+
+#clock {
+    font-weight: bold;
+    color: #cba6f7; /* Mauve */
+}
+
+#memory {
+    color: #b4befe; /* Lavender */
+}
+
+/* Unified Sound Group (Slider + Volume) */
+.modules-right > widget > box {
+    padding: 0 5px;
+}
+
+#pulseaudio-slider {
+    padding: 0 10px;
+    background-color: transparent;
+}
+
+#pulseaudio-slider trough {
+    min-height: 4px;
+    min-width: 50px;
+    border-radius: 2px;
+    background-color: rgba(166, 227, 161, 0.15);
+}
+
+#pulseaudio-slider highlight {
+    min-height: 4px;
+    border-radius: 2px;
+    background-color: #a6e3a1; /* Yellowish Green */
+}
+
+#pulseaudio-slider slider {
+    min-height: 12px;
+    min-width: 12px;
+    border-radius: 6px;
+    background-color: #45475a; /* Even darker grey for eye comfort */
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.1);
+    margin: -4px 0;
+}
+
+#pulseaudio {
+    color: #a6e3a1;
+    background-color: transparent;
+    padding: 0 10px 0 5px;
+}
+
+#pulseaudio.microphone {
+    color: #f5e0dc; /* Rosewater */
+}
+
+#pulseaudio.muted {
+    color: #f38ba8;
+}
+
+/* Tray / Background Apps */
+#tray {
+    background-color: rgba(30, 30, 30, 0.75);
+    border-radius: 12px;
+    padding: 4px 16px;
+    margin: 4px 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#tray menu {
+    background-color: #1e1e2e;
+    color: #f5c2e7;
+    border-radius: 8px;
+}
+
+/* Tray and others */
+#tray {
+    color: #f5e0dc;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #11111b;
+    }
+}

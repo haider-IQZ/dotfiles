@@ -1,0 +1,71 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "margin-top": 6,
+    "margin-left": 8,
+    "margin-right": 8,
+    "spacing": 0,
+    
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["tray", "memory", "group/audio", "pulseaudio#microphone"],
+    
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    },
+    "group/audio": {
+        "orientation": "horizontal",
+        "modules": ["pulseaudio/slider", "pulseaudio"]
+    },
+    
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "persistent_workspaces": false,
+        "format": "{name}"
+    },
+    
+    "clock": {
+        "format": "{:%H:%M}"
+    },
+    
+    "memory": {
+        "format": " {used:0.1f}G / {total:0.1f}G",
+        "tooltip-format": "Memory: {used:0.1f}G / {total:0.1f}G"
+    },
+    
+    "pulseaudio": {
+        "format": "{icon}  {volume}%",
+        "format-bluetooth": "󰂯  {volume}%",
+        "format-bluetooth-muted": "󰂲  Muted",
+        "format-muted": "  Muted",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    },
+
+    "pulseaudio#microphone": {
+        "format": "{format_source}",
+        "format-source": "  {volume}%",
+        "format-source-muted": "  Muted",
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "scroll-step": 5
+    },
+
+    "pulseaudio/slider": {
+        "min": 0,
+        "max": 100,
+        "orientation": "horizontal"
+    }
+}
