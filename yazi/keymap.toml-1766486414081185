@@ -1,4 +1,0 @@
-[manager]
-prepend_keymap = [
-	{ on = [ "<C-h>" ], run = "hidden toggle", desc = "Toggle hidden files" },
-]
