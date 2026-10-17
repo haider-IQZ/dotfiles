@@ -35,6 +35,9 @@ Item {
     Component.onDestruction: music.setPositionClient(card, false)
 
     readonly property string art: visible ? shell.mediaArt(player) : ""
+    // the big cover: YouTube's 1280x720 thumbnail; videos without one fall back to `art`
+    readonly property string bigArt: visible ? shell.mediaArt(player, true) : ""
+    property string missingArt: ""
 
     width: 800
     height: 440
@@ -321,7 +324,8 @@ Item {
                     Image {
                         id: cover
                         anchors.fill: parent
-                        source: card.art
+                        source: card.bigArt && card.bigArt !== card.missingArt ? card.bigArt : card.art
+                        onStatusChanged: if (status === Image.Error && card.bigArt && card.bigArt !== card.art) card.missingArt = card.bigArt
                         sourceSize { width: 600; height: 600 }
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true

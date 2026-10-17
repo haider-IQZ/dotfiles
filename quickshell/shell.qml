@@ -150,13 +150,14 @@ ShellRoot {
     Timer { id: mediaSwitch; interval: 1500; onTriggered: root.showWanted() }
     readonly property var media: mediaShown && mediaList.includes(mediaShown) ? mediaShown : mediaWanted
     // cover art for a player: its own, else the YouTube thumbnail built from the video link
-    // (Firefox sends no art for YouTube), else "" (then the player app's logo shows instead)
-    function mediaArt(p) {
+    // (Firefox sends no art for YouTube), else "" (then the player app's logo shows instead).
+    // big: YouTube's 1280x720 one (not every video has it) instead of the 320x180 one.
+    function mediaArt(p, big) {
         if (!p) return ""
         if (p.trackArtUrl) return p.trackArtUrl
         const url = String(p.metadata?.["xesam:url"] ?? "")
         const m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([\w-]{11})/)
-        return m ? "https://i.ytimg.com/vi/" + m[1] + "/mqdefault.jpg" : ""
+        return m ? "https://i.ytimg.com/vi/" + m[1] + (big ? "/maxresdefault.jpg" : "/mqdefault.jpg") : ""
     }
     // the player app's logo (Firefox, Spotify...), for tracks without any art
     function mediaAppIcon(p) {
