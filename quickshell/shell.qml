@@ -636,15 +636,18 @@ ShellRoot {
                 readonly property string target: root.wallpaper ? Paths.toFileUrl(root.wallpaper) : ""
                 onTargetChanged: load()
                 Component.onCompleted: load()
+                // (each picture remembers the url it was asked for: Image.source reads back decoded,
+                // "Snowy Neon.png" instead of "Snowy%20Neon.png", so comparing that never matched)
                 function load() {
                     if (wallFade.running) wallFade.complete()
-                    if (front.source.toString() === target && front.opacity === 1) return
+                    if (front.want === target && front.opacity === 1) return
                     back.opacity = 0
+                    back.want = target
                     back.source = target
                     if (!target) wallFade.fadeOutFront()
                 }
                 function ready(img) {
-                    if (img !== back || img.status !== Image.Ready || img.source.toString() !== target) return
+                    if (img !== back || img.status !== Image.Ready || img.want !== target) return
                     img.z = 1; front.z = 0
                     wallFade.target = img
                     wallFade.restart()
@@ -655,16 +658,18 @@ ShellRoot {
                     from: 0; to: 1
                     duration: 650
                     easing.type: Easing.InOutQuad
-                    function fadeOutFront() { wallWindow.front.opacity = 0; wallWindow.front.source = "" }
+                    function fadeOutFront() { wallWindow.front.opacity = 0; wallWindow.front.want = ""; wallWindow.front.source = "" }
                     onFinished: {
                         const old = wallWindow.front
                         wallWindow.front = wallFade.target
                         old.opacity = 0
+                        old.want = ""
                         old.source = ""
                     }
                 }
                 Image {
                     id: wallA
+                    property string want: ""
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectCrop
                     sourceSize: Qt.size(bar.screen.width, bar.screen.height)
@@ -675,6 +680,7 @@ ShellRoot {
                 }
                 Image {
                     id: wallB
+                    property string want: ""
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectCrop
                     sourceSize: Qt.size(bar.screen.width, bar.screen.height)
