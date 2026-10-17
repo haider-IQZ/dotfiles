@@ -263,6 +263,20 @@ ShellRoot {
         const head = "# Written by the bar (shell.qml, \"terminal colors\"): follows the wallpaper. Edits get replaced.\n"
         const files = []
         const t = root.themeDir + "/"
+        // GTK3 apps (adw-gtk3's named colors; ~/.config/gtk-3.0/gtk.css imports this): dark
+        // backgrounds tinted toward the wallpaper, the accent for selections and buttons
+        const tint = l => "#" + hex(Qt.hsla(h, Math.min(s, 0.45), l, 1))
+        files.push([t + "gtk3.css", "/* Written by the bar (shell.qml, \"terminal colors\"): follows the wallpaper. */\n"
+            + "@define-color accent_color #" + a + ";\n@define-color accent_bg_color #" + a + ";\n"
+            + "@define-color accent_fg_color #000000;\n"
+            + "@define-color window_bg_color " + tint(0.075) + ";\n@define-color window_fg_color #e6e1d8;\n"
+            + "@define-color view_bg_color " + tint(0.055) + ";\n@define-color view_fg_color #e6e1d8;\n"
+            + "@define-color headerbar_bg_color " + tint(0.09) + ";\n@define-color headerbar_fg_color #e6e1d8;\n"
+            + "@define-color headerbar_backdrop_color " + tint(0.075) + ";\n"
+            + "@define-color sidebar_bg_color " + tint(0.085) + ";\n@define-color sidebar_fg_color #e6e1d8;\n"
+            + "@define-color card_bg_color alpha(#ffffff, 0.04);\n"
+            + "@define-color popover_bg_color " + tint(0.11) + ";\n@define-color popover_fg_color #e6e1d8;\n"
+            + "@define-color dialog_bg_color " + tint(0.09) + ";\n@define-color dialog_fg_color #e6e1d8;\n"])
         files.push([t + "foot.ini", head + "[colors-dark]\nbackground=" + b + "\nselection-background=" + l + "\ncursor=" + b + " " + a + "\n"])
         files.push([t + "alacritty.toml", head + "[colors.primary]\nbackground = \"#" + b + "\"\n\n[colors.cursor]\ntext = \"#" + b
             + "\"\ncursor = \"#" + a + "\"\n\n[colors.selection]\ntext = \"#e6e1d8\"\nbackground = \"#" + l + "\"\n"])
