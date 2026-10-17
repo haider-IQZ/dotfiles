@@ -38,6 +38,14 @@ Item {
     // the big cover: YouTube's 1280x720 thumbnail; videos without one fall back to `art`
     readonly property string bigArt: visible ? shell.mediaArt(player, true) : ""
     property string missingArt: ""
+    // a small cover (Chromium/Helium send ~150px ones) or none: have the bar find an HD one
+    function maybeLookup() {
+        if (!visible || !player || isLocal) return
+        const small = cover.status === Image.Ready && cover.implicitWidth < 400
+        const none = cover.status === Image.Error || !art
+        if (small || none) shell.lookupArt(player)
+    }
+    onArtChanged: Qt.callLater(maybeLookup)
 
     width: 800
     height: 440
@@ -70,7 +78,7 @@ Item {
             : []
     }
     onWantsStreamsChanged: { streamTimer.stop(); refreshStreams() }
-    onPlayerChanged: if (wantsStreams) refreshStreams()
+    onPlayerChanged: { if (wantsStreams) refreshStreams(); Qt.callLater(maybeLookup) }
     onLiveNodesChanged: if (wantsStreams) streamTimer.restart()
     Timer { id: streamTimer; interval: 75; onTriggered: card.refreshStreams() }
     PwObjectTracker { objects: card.streams }
@@ -325,7 +333,10 @@ Item {
                         id: cover
                         anchors.fill: parent
                         source: card.bigArt && card.bigArt !== card.missingArt ? card.bigArt : card.art
-                        onStatusChanged: if (status === Image.Error && card.bigArt && card.bigArt !== card.art) card.missingArt = card.bigArt
+                        onStatusChanged: {
+                            if (status === Image.Error && card.bigArt && card.bigArt !== card.art) card.missingArt = card.bigArt
+                            card.maybeLookup()
+                        }
                         sourceSize { width: 600; height: 600 }
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true

@@ -152,12 +152,46 @@ ShellRoot {
     // cover art for a player: its own, else the YouTube thumbnail built from the video link
     // (Firefox sends no art for YouTube), else "" (then the player app's logo shows instead).
     // big: YouTube's 1280x720 one (not every video has it) instead of the 320x180 one.
+    // A track looked up on YouTube (lookupArt) wins over the player's own tiny cover.
     function mediaArt(p, big) {
         if (!p) return ""
+        const thumb = id => "https://i.ytimg.com/vi/" + id + (big ? "/maxresdefault.jpg" : "/mqdefault.jpg")
+        const found = p !== music ? artIds[artKey(p)] : ""
+        if (found) return thumb(found)
         if (p.trackArtUrl) return p.trackArtUrl
         const url = String(p.metadata?.["xesam:url"] ?? "")
         const m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([\w-]{11})/)
-        return m ? "https://i.ytimg.com/vi/" + m[1] + (big ? "/maxresdefault.jpg" : "/mqdefault.jpg") : ""
+        return m ? thumb(m[1]) : ""
+    }
+
+    // HD covers for players that send only a tiny cover and no link (Chromium/Helium send
+    // ~150px ones): look the track up on YouTube by title + artist (the channel) with yt-dlp
+    // and use that video's thumbnails. The music card asks for it only when its cover is small
+    // or missing; one search at a time, each track once.
+    property var artIds: ({})   // "title\nartist" -> YouTube video id ("" = nothing found)
+    function artKey(p) { return p ? (p.trackTitle || "") + "\n" + (p.trackArtist || "") : "" }
+    function lookupArt(p) {
+        const key = artKey(p)
+        if (!p || p === music || !p.trackTitle || key in artIds) return
+        if (artSearch.running) { if (artSearch.forKey !== key) artSearch.next = p; return }
+        artSearch.forKey = key
+        artSearch.command = ["yt-dlp", "--no-warnings", "--flat-playlist", "--print", "id",
+            "ytsearch1:" + p.trackTitle + " " + (p.trackArtist || "")]
+        artSearch.running = true
+    }
+    Process {
+        id: artSearch
+        property string forKey: ""
+        property var next: null
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const id = this.text.trim().split("\n")[0] || ""
+                const ids = Object.assign({}, root.artIds)
+                ids[artSearch.forKey] = /^[\w-]{11}$/.test(id) ? id : ""
+                root.artIds = ids
+            }
+        }
+        onExited: if (next) { const p = next; next = null; Qt.callLater(() => root.lookupArt(p)) }
     }
     // the player app's logo (Firefox, Spotify...), for tracks without any art
     function mediaAppIcon(p) {
