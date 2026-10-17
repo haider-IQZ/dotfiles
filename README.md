@@ -22,10 +22,11 @@ that grows into whatever you open:
 
 ### Needs
 
-- quickshell 0.3.x, Hyprland
+- quickshell 0.3.x, Hyprland (either the classic `hyprland.conf` or the new `hyprland.lua`:
+  the bar checks which one you have)
 - fonts: Inter (text), JetBrainsMono Nerd Font (icons); Papirus-Dark icon theme
 - mpv, ffmpeg (local music + covers), yt-dlp (downloads), NetworkManager (`nmcli`)
-- optional: a `dns <provider>` command for the DNS buttons (mine is in `~/hq/scripts/dns`)
+- optional: `extras/dns` on your PATH as `dns`, for the DNS buttons in the network card
 
 ### Use
 
@@ -56,3 +57,42 @@ rewrites whenever the accent changes, for the terminal to pick up:
 `starship.toml` (your `~/.config/starship.toml` with its `accent` palette color swapped), and
 `fish.fish` (source it; the bar sets the universal variable `bar_theme` when it changes, so
 open shells can reload it and recolor their terminal).
+
+### Hook the terminal up (optional)
+
+The bar keeps `$XDG_STATE_HOME/bar/theme/` in the wallpaper's colors; point your tools at it:
+
+```ini
+# ~/.config/foot/foot.ini, under [main] (don't set background/cursor/selection-background yourself)
+include=~/.local/state/bar/theme/foot.ini
+```
+
+```toml
+# ~/.config/alacritty/alacritty.toml (don't set primary.background/cursor/selection yourself)
+[general]
+import = ["~/.local/state/bar/theme/alacritty.toml"]
+```
+
+```css
+/* ~/.config/gtk-3.0/gtk.css: GTK3 apps (adw-gtk3 theme) in the wallpaper's colors */
+@import url("file:///home/YOU/.local/state/bar/theme/gtk3.css");
+```
+
+- **fish**: `source extras/fish/bar-theme.fish` from `config.fish`. Open shells recolor
+  themselves when the wallpaper changes, and `ls`/`eza` folders follow the accent.
+- **starship**: keep your config at `~/.config/starship.toml`, define a palette color named
+  `accent` and use it (`style = "bold accent"`); the bar writes a copy with the wallpaper's
+  accent and fish points `STARSHIP_CONFIG` at it.
+- **fzf**: highlights come from `FZF_DEFAULT_OPTS_FILE` (set by the fish file); keep `hl`,
+  `pointer`, `prompt`... out of your own `FZF_DEFAULT_OPTS`.
+- **fetch**: `extras/fish/fetch.fish` is a coffee mug in the accent's shades with some system
+  facts; source it and call `fetch` (e.g. at the end of `config.fish`).
+
+### Glass windows (Hyprland)
+
+Blur plus a little transparency makes apps sit nicely on the wallpaper, e.g. in `hyprland.lua`:
+
+```lua
+hl.window_rule({ name = "obsidian-glass", match = { class = "^(obsidian)$" }, opacity = "0.88 0.85" })
+```
+

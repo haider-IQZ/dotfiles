@@ -309,6 +309,16 @@ ShellRoot {
         writeFiles(files)
     }
 
+    // Hyprland commands: the new Lua config (hyprland.lua) takes them as Lua, the classic
+    // hyprland.conf as plain dispatcher text, so send whichever this machine uses
+    property bool hyprLua: false
+    FileView {
+        path: (Quickshell.env("XDG_CONFIG_HOME") || root.home + "/.config") + "/hypr/hyprland.lua"
+        printErrors: false
+        onLoaded: root.hyprLua = true
+    }
+    function hyprDispatch(lua, classic) { Hyprland.dispatch(hyprLua ? lua : classic) }
+
     // app launcher (Launcher.qml), Super+D; wallpaper picker (WallpaperPicker.qml), Super+W
     Launcher { id: launcher; shell: root }
     WallpaperPicker { id: wallPicker; shell: root }
@@ -521,7 +531,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 anchors.margins: -3
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: { dropdown.open = ""; Hyprland.dispatch("hl.dsp.focus({ workspace = " + slot.modelData + " })") }
+                                onClicked: { dropdown.open = ""; root.hyprDispatch("hl.dsp.focus({ workspace = " + slot.modelData + " })", "workspace " + slot.modelData) }
                             }
                         }
                     }

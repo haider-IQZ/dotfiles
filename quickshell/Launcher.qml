@@ -106,7 +106,7 @@ Scope {
         for (const t of Hyprland.toplevels.values) {
             const addr = String(t.address).replace(/^0x/, "")
             if (/^[0-9a-fA-F]+$/.test(addr) && addr !== "0")
-                Hyprland.dispatch('hl.dsp.window.close({ window = "address:0x' + addr + '" })')
+                shell.hyprDispatch('hl.dsp.window.close({ window = "address:0x' + addr + '" })', "closewindow address:0x" + addr)
         }
         logoutPoll.start()
         logoutTimeout.start()
@@ -152,7 +152,7 @@ Scope {
                 launcher.loggingOut = false
                 logoutPoll.stop()
                 logoutTimeout.stop()
-                Hyprland.dispatch("hl.dsp.exit()")
+                launcher.shell.hyprDispatch("hl.dsp.exit()", "exit")
             }
         }
         onRunningChanged: if (!running && pending) {
